@@ -1,0 +1,40 @@
+#var token was defind in variabls tab
+trigger: none
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: refs/heads/test
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    name: pool-name
+  steps:
+  - checkout: self
+    clean: false
+
+  - task: Bash@3
+    displayName: pwd and hostname
+    inputs:
+      targetType: inline
+      script: |
+        echo "this is pwd:"
+        pwd
+        echo "this is hostname:"
+        hostname
+
+  - task: Bash@3
+    displayName: chmod +x and dos2unix
+    inputs:
+      targetType: inline
+      script: |
+        find ./ -maxdepth 1 -type f -name "*.sh" -exec dos2unix {} \;
+        find ./ -maxdepth 1 -type f -name "*.sh" -exec chmod +x {} \;
+
+  - task: Bash@3
+    displayName: Clone All Repos With All Branches
+    inputs:
+      filePath: cloneAllRepos.sh
+      arguments: $(TOKEN)
+      
